@@ -1,15 +1,16 @@
 {application, xep0363_crypt,
- [{description, "An OTP library"},
+ [{description, "XEP-0363 (HTTP File Upload) file encryption/decryption"},
   {vsn, "0.1.0"},
   {registered, []},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    inets
    ]},
   {env,[]},
   {modules, []},
 
-  {maintainers, []},
+  {maintainers, ["Michael Santos"]},
   {licenses, ["Apache 2.0"]},
-  {links, []}
+  {links, [{"Github","https://github.com/msantos/xep0363_crypt"}]}
  ]}.

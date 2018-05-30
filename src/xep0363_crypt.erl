@@ -35,7 +35,7 @@ fetch(URI0) ->
     {error, _} = Error ->
       Error;
     {ok, URI, Key} ->
-      case httpc:request(["https://", URI]) of
+      case httpc:request(binary_to_list(iolist_to_binary(URI))) of
         {ok, {{_,200,_}, _Headers, Body}} ->
           {ok, Key, list_to_binary(Body)};
         {error, _} = Error ->
