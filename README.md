@@ -19,17 +19,16 @@ main([URI]) ->
 main([URI, Filename]) ->
   application:ensure_all_started(ssl),
   application:ensure_all_started(inets),
-  {ok, Key, CipherText} = xep0363_crypt:fetch(URI),
-  case xep0363_crypt:decrypt(CipherText, Key) of
-    error ->
-      io:format(standard_error, "~s~n", ["decrypt error"]);
-    PlainText ->
-      io:format(fd(Filename), "~s", [PlainText])
+  {ok, FD} = fd(Filename),
+  case xep0363_crypt:download(URI) of
+    {ok, PlainText} ->
+      io:format(FD, "~s", [PlainText])
+    {error, Error} ->
+      io:format(standard_error, "~s~n", [Error])
   end.
 
 fd("-") ->
-  standard_io;
+  {ok, standard_io};
 fd(Name) ->
-  {ok, FD} = file:open(Name, [write, raw]),
-  FD.
+  file:open(Name, [write, raw]).
 ~~~

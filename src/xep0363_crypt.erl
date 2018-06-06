@@ -1,7 +1,8 @@
 -module(xep0363_crypt).
 
 %% API exports
--export([uri/1,
+-export([download/1,
+         uri/1,
          fetch/1,
          decrypt/2,
          decrypt_file/2,
@@ -12,6 +13,20 @@
 %%====================================================================
 %% API functions
 %%====================================================================
+
+-spec download(string() | binary()) -> {ok, binary()} | {error, term()}.
+download(URI) ->
+  case fetch(URI) of
+    {ok, CipherText, Key} ->
+      case decrypt(CipherText, Key) of
+        error ->
+          {error, decrypt_failed};
+        PlainText ->
+          {ok, PlainText}
+      end;
+    {error, _} = Error ->
+      Error
+  end.
 
 -spec uri(string() | binary())
   -> {ok, binary(), {aesgcm, binary()} | plaintext} | {error, atom()}.
@@ -29,7 +44,8 @@ uri(<<"https://", _/binary>> = URI) ->
 uri(_) ->
   {error, unsupported}.
 
--spec fetch(string() | binary()) -> {ok, binary(), binary()} | {error, term()}.
+-spec fetch(string() | binary())
+  -> {ok, binary(), {aesgcm, binary()} | plaintext} | {error, term()}.
 fetch(URI0) ->
   case uri(URI0) of
     {error, _} = Error ->
@@ -37,7 +53,7 @@ fetch(URI0) ->
     {ok, URI, Key} ->
       case httpc:request(binary_to_list(iolist_to_binary(URI))) of
         {ok, {{_,200,_}, _Headers, Body}} ->
-          {ok, Key, list_to_binary(Body)};
+          {ok, list_to_binary(Body), Key};
         {error, _} = Error ->
           Error;
         Unknown ->
