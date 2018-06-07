@@ -76,17 +76,17 @@ decrypt_file(File, KeyHex) ->
       Error
   end.
 
--spec iveckey(<<_:768>>) -> {<<_:128>> | <<_:96>>, <<_:256>>}.
-iveckey(<<_:96/bytes>> = Hex) ->
+-spec iveckey(<<_:768>> | <<_:704>>) -> {<<_:128>> | <<_:96>>, <<_:256>>}.
+iveckey(Hex) ->
   Bytes = << <<(binary_to_integer(N, 16))>> || <<N:2/bytes>> <= Hex >>,
-  case Bytes of
-    % old format
-    <<Ivec:16/bytes, Key:32/bytes>> ->
-      {Ivec, Key};
-    % new format
-    <<Ivec:12/bytes, Key:32/bytes>> ->
-      {Ivec, Key}
-  end.
+  iveckey_1(Bytes).
+
+% old format
+iveckey_1(<<Ivec:16/bytes, Key:32/bytes>>) ->
+    {Ivec, Key};
+% new format
+iveckey_1(<<Ivec:12/bytes, Key:32/bytes>>) ->
+    {Ivec, Key}.
 
 -spec decrypt(iodata(), binary() | {aesgcm, binary()} | plaintext)
   -> binary() | error.
