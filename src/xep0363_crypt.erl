@@ -10,6 +10,10 @@
          encrypt_file/1, encrypt_file/2,
          iveckey/1]).
 
+-type key() :: {aesgcm, binary()} | plaintext.
+
+-export_type([key/0]).
+
 %%====================================================================
 %% API functions
 %%====================================================================
@@ -29,7 +33,7 @@ download(URI) ->
   end.
 
 -spec uri(string() | binary())
-  -> {ok, binary(), {aesgcm, binary()} | plaintext} | {error, atom()}.
+  -> {ok, binary(), key()} | {error, atom()}.
 uri(URI) when is_list(URI) ->
   uri(list_to_binary(URI));
 uri(<<"aesgcm://", URI/binary>>) ->
@@ -45,7 +49,7 @@ uri(_) ->
   {error, unsupported}.
 
 -spec fetch(string() | binary())
-  -> {ok, binary(), {aesgcm, binary()} | plaintext} | {error, term()}.
+  -> {ok, binary(), key()} | {error, term()}.
 fetch(URI0) ->
   case uri(URI0) of
     {error, _} = Error ->
@@ -61,7 +65,7 @@ fetch(URI0) ->
       end
   end.
 
--spec decrypt_file(file:name_all(), binary() | {aesgcm, binary()} | plaintext)
+-spec decrypt_file(file:name_all(), binary() | key())
   -> {ok, binary()} | {error, file:posix() | badarg | terminated | system_limit}.
 decrypt_file(File, KeyHex) ->
   case file:read_file(File) of
@@ -88,7 +92,7 @@ iveckey_1(<<Ivec:16/bytes, Key:32/bytes>>) ->
 iveckey_1(<<Ivec:12/bytes, Key:32/bytes>>) ->
     {Ivec, Key}.
 
--spec decrypt(iodata(), binary() | {aesgcm, binary()} | plaintext)
+-spec decrypt(iodata(), binary() | key())
   -> binary() | error.
 decrypt(CipherText, Key) when is_list(CipherText) ->
   decrypt(iolist_to_binary(CipherText), Key);
