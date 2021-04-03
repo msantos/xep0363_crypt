@@ -1,16 +1,16 @@
-{application, xep0363_crypt,
- [{description, "XEP-0363 (HTTP File Upload) file encryption/decryption"},
-  {vsn, "0.1.0"},
-  {registered, []},
-  {applications,
-   [kernel,
-    stdlib,
-    inets
-   ]},
-  {env,[]},
-  {modules, []},
+{application, xep0363_crypt, [
+    {description, "XEP-0363 (HTTP File Upload) file encryption/decryption"},
+    {vsn, "0.1.0"},
+    {registered, []},
+    {applications, [
+        kernel,
+        stdlib,
+        inets
+    ]},
+    {env, []},
+    {modules, []},
 
-  {maintainers, ["Michael Santos"]},
-  {licenses, ["Apache 2.0"]},
-  {links, [{"Github","https://github.com/msantos/xep0363_crypt"}]}
- ]}.
+    {maintainers, ["Michael Santos"]},
+    {licenses, ["Apache 2.0"]},
+    {links, [{"Github", "https://github.com/msantos/xep0363_crypt"}]}
+]}.
