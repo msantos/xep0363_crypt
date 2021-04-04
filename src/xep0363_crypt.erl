@@ -102,7 +102,15 @@ decrypt(CipherText, {aesgcm, KeyHex}) ->
     {Ivec, KeyBytes} = iveckey(KeyHex),
     CipherLen = byte_size(CipherText) - 16,
     <<CipherData:CipherLen/bytes, CipherTag:16/bytes>> = CipherText,
-    crypto:block_decrypt(aes_gcm, KeyBytes, Ivec, {<<>>, CipherData, CipherTag});
+    crypto:crypto_one_time_aead(
+        aes_256_gcm,
+        KeyBytes,
+        Ivec,
+        CipherData,
+        <<>>,
+        CipherTag,
+        false
+    );
 decrypt(CipherText, Key) when is_binary(Key) ->
     decrypt(CipherText, {aesgcm, Key}).
 
@@ -137,11 +145,14 @@ encrypt(PlainText, plaintext) ->
 encrypt(PlainText, {aesgcm, IVLen}) ->
     Key = crypto:strong_rand_bytes(32),
     IVec = crypto:strong_rand_bytes(IVLen),
-    {CipherText, CipherTag} = crypto:block_encrypt(
-        aes_gcm,
+    {CipherText, CipherTag} = crypto:crypto_one_time_aead(
+        aes_256_gcm,
         Key,
         IVec,
-        {<<>>, PlainText, 16}
+        PlainText,
+        <<>>,
+        16,
+        true
     ),
     {[CipherText, CipherTag], to_hex(<<IVec/binary, Key/binary>>)}.
 
