@@ -88,9 +88,9 @@ iveckey(Hex) ->
     iveckey_1(Bytes).
 
 % old format
-iveckey_1(<<Ivec:16/bytes, Key:32/bytes>>) -> {Ivec, Key};
+iveckey_1(<<IVec:16/bytes, Key:32/bytes>>) -> {IVec, Key};
 % new format
-iveckey_1(<<Ivec:12/bytes, Key:32/bytes>>) -> {Ivec, Key}.
+iveckey_1(<<IVec:12/bytes, Key:32/bytes>>) -> {IVec, Key}.
 
 -spec decrypt(iodata(), binary() | key()) -> binary() | error.
 
@@ -99,13 +99,13 @@ decrypt(CipherText, Key) when is_list(CipherText) ->
 decrypt(PlainText, plaintext) ->
     PlainText;
 decrypt(CipherText, {aesgcm, KeyHex}) ->
-    {Ivec, KeyBytes} = iveckey(KeyHex),
+    {IVec, KeyBytes} = iveckey(KeyHex),
     CipherLen = byte_size(CipherText) - 16,
     <<CipherData:CipherLen/bytes, CipherTag:16/bytes>> = CipherText,
     crypto:crypto_one_time_aead(
         aes_256_gcm,
         KeyBytes,
-        Ivec,
+        IVec,
         CipherData,
         <<>>,
         CipherTag,
