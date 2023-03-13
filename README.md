@@ -1,17 +1,17 @@
-xep0363_crypt
-=============
+# xep0363_crypt
 
-XEP-0363 (HTTP File Upload) file encryption/decryption
+[XEP-0363 (HTTP File Upload)](https://xmpp.org/extensions/xep-0363.html)
+file encryption/decryption
 
-Build
------
+## Build
 
-    $ rebar3 compile
+```
+$ rebar3 compile
+```
 
-Example
--------
+## Example
 
-~~~
+```
 #!/usr/bin/env escript
 
 main([URI]) ->
@@ -31,4 +31,4 @@ fd("-") ->
   {ok, standard_io};
 fd(Name) ->
   file:open(Name, [write, raw]).
-~~~
+```
